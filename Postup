@@ -1,0 +1,100 @@
+# Permission / security guardrail návrh
+
+{
+  "permissions": {
+    "allowedCommands": [
+      "git",
+      "mvn",
+      "./mvnw",
+      "gradle",
+      "./gradlew",
+      "npm",
+      "node",
+      "docker",
+      "docker-compose",
+      "docker compose",
+      "psql",
+      "grep",
+      "find",
+      "sed",
+      "awk",
+      "cat",
+      "ls"
+    ],
+    "blockedCommands": [
+      "rm",
+      "sudo",
+      "chmod 777",
+      "curl | sh",
+      "wget | sh"
+    ],
+    "allowedDirectories": [
+      "./src",
+      "./frontend",
+      "./docs",
+      "./docker",
+      "./migrations",
+      "./config",
+      "./scripts",
+      "./tests"
+    ],
+    "blockedDirectories": [
+      "./.git",
+      "./node_modules",
+      "./target",
+      "./build",
+      "./.env",
+      "./secrets",
+      "./certs"
+    ],
+    "requireConfirmation": [
+      "git push",
+      "docker push",
+      "npm publish",
+      "./mvnw release:*",
+      "./gradlew publish"
+    ]
+  }
+}
+
+# File protection hook nápad
+
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "if [[ \"$CLAUDE_FILE_PATHS\" == *\".env\"* ]] || [[ \"$CLAUDE_FILE_PATHS\" == *\"application-prod.yml\"* ]] || [[ \"$CLAUDE_FILE_PATHS\" == *\"secrets\"* ]]; then echo 'Protected file: modification blocked'; exit 2; fi"
+      }]
+    }]
+  }
+}
+
+CLAUDE.md drží stály projektový kontext,
+AGENTS.md drží špecializované role,
+.claude/commands/ drží opakované workflow,
+permissions + hooks držia guardraily.
+
+Príklady promptov
+
+Architektúra feature
+Use @backend-architect, then @security-auditor, then @db-expert.
+Design customer onboarding with KYC review, Keycloak-based authorization, audit trail, PostgreSQL persistence, Docker deployment, and React admin UI.
+
+PR review
+Use @code-reviewer and @security-auditor.
+Review this change for SOLID, transaction boundaries, API contract stability, Spring Security issues, and production readiness.
+
+Výkon DB
+Use @db-expert.
+Review query performance, indexes, transaction scope, and locking risks for account search and customer profile loading.
+
+CLAUDE.md
+AGENTS.md
+.claude/
+  commands/
+    review-enterprise.md
+    design-backend.md
+    security-audit.md
+    db-review.md
